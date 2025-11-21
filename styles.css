@@ -118,3 +118,10 @@ section .infos {
   align-items: center;
   gap: var(--spacing-lg);
 }
+.game-over{
+   display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
+  
+}

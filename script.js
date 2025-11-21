@@ -1,6 +1,12 @@
 const board = document.querySelector(".board");
 const modal = document.querySelector(".modal");
-const startButtton = document.querySelector(".btn-start");
+const startButton = document.querySelector(".btn-start");
+
+const startGameModal = document.querySelector(".start-game");
+const gameOverModal = document.querySelector(".game-over");
+const restartButton = document.querySelector(".btn-restart");
+
+
 
 
 const blockWidth = 50;
@@ -10,7 +16,7 @@ let direction = "down";
 let intervalId = null;
 
 const blocks = [];
-const snake = [
+let snake = [
     { x: 1, y: 3 },
     { x: 1, y: 4 },
     { x: 1, y: 5 },
@@ -52,8 +58,11 @@ function drawSnake() {
 
     // ✅ check game over
     if (head.x < 0 || head.x >= rows || head.y < 0 || head.y >= cols) {
+
+        modal.style.display = "flex";
+        startGameModal.style.display = "none";
         clearInterval(intervalId);
-        alert("Game over");
+
         return;
     }
 
@@ -83,6 +92,28 @@ function drawSnake() {
 
 // intervalId = setInterval(drawSnake, 400);
 
+restartButton.addEventListener("click", restartGame);
+
+function restartGame() {
+    blocks[`${food.x} - ${food.y}`].classList.remove("food");
+    snake.forEach(segement => {
+        const block = blocks[`${segement.x} - ${segement.y}`];
+        if (block) block.classList.remove("fill");
+    });
+
+    modal.style.display = "none";
+    gameOverModal.style.display = "none";
+    snake = [
+        { x: 4, y: 3 },
+        { x: 4, y: 4 },
+        { x: 4, y: 5 }
+    ];
+    food = { x: Math.floor(Math.random() * rows), y: Math.floor(Math.random() * cols) };
+    blocks[`${food.x} - ${food.y}`].classList.add("food");
+    intervalId = setInterval(drawSnake, 300);
+    gameOverModal.style.display = "flex";
+}
+
 addEventListener("keydown", event => {
     if (event.key === "ArrowUp") {
         direction = "up";
@@ -98,8 +129,8 @@ addEventListener("keydown", event => {
     }
 });
 
-startButtton.addEventListener("click", () => {
+startButton.addEventListener("click", () => {
     modal.style.display = "none";
-    intervalId = setInterval(drawSnake, 400);
-    
+    intervalId = setInterval(drawSnake, 300);
+
 });
