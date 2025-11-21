@@ -6,14 +6,24 @@ const startGameModal = document.querySelector(".start-game");
 const gameOverModal = document.querySelector(".game-over");
 const restartButton = document.querySelector(".btn-restart");
 
+const highScoreElement = document.querySelector("#high-score");
+const scoreElement = document.querySelector("#score");
+const timeElement = document.querySelector("#timing");
 
 
+let highScore = localStorage.getItem("highScore") || 0;
+let score = 0;
+let time = `00-00`;
+highScoreElement.innerText = highScore;
+
+
+let direction = "down";
+let intervalId = null;
+let timerIntervalId = null;
 
 const blockWidth = 50;
 const blockHeight = 50;
 
-let direction = "down";
-let intervalId = null;
 
 const blocks = [];
 let snake = [
@@ -72,13 +82,25 @@ function drawSnake() {
         // ✅ update global food
         food = { x: Math.floor(Math.random() * rows), y: Math.floor(Math.random() * cols) };
         blocks[`${food.x} - ${food.y}`].classList.add("food");
+
         // don’t pop tail → snake grows
+        // update the score 
+        score += 10;
+        scoreElement.innerText = score;
+
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem("highScore",highScore.toString());
+           
+        }
     } else {
         snake.pop();
     }
 
     // add new head
     snake.unshift(head);
+
+
 
     // draw food
     blocks[`${food.x} - ${food.y}`].classList.add("food");
@@ -95,11 +117,18 @@ function drawSnake() {
 restartButton.addEventListener("click", restartGame);
 
 function restartGame() {
+    
     blocks[`${food.x} - ${food.y}`].classList.remove("food");
     snake.forEach(segement => {
         const block = blocks[`${segement.x} - ${segement.y}`];
         if (block) block.classList.remove("fill");
     });
+
+    score = 0;
+    time = `00-00`;
+    scoreElement.innerText = score;
+    timeElement.innerText = time;
+    highScoreElement.innertext = highScore;
 
     modal.style.display = "none";
     gameOverModal.style.display = "none";
@@ -132,5 +161,16 @@ addEventListener("keydown", event => {
 startButton.addEventListener("click", () => {
     modal.style.display = "none";
     intervalId = setInterval(drawSnake, 300);
+    timerIntervalId = setInterval(()=>{
+        let [min,sec] = time.split("-").map(Number);
+        if(sec == 59){
+            min += 1;
+            sec = 0;
+        }else{
+            sec +=1;
+        }
+        time = `${min}-${sec}`;
+        timeElement.innerText = time;
+    },1000)
 
 });
